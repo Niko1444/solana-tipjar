@@ -11,6 +11,14 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        primary: "Urbanist Variable, sans-serif",
+        secondary: "Monofett, monospace",
+      },
+      fontWeight: {
+        regular: 400,
+        black: 800,
+      },
     },
   },
   plugins: [],
