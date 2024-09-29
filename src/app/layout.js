@@ -5,6 +5,7 @@ import "@fontsource/monofett";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+import AuthLayout from "../components/utils/auth-layout";
 
 export const metadata = {
   title: "Create Next App",
@@ -15,9 +16,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="main-bg flex flex-col min-h-screen">
-        <Header />
-        {children}
-        <Footer />
+        <AuthLayout>
+          {" "}
+          {/* Client-side component for SessionProvider */}
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </AuthLayout>
       </body>
     </html>
   );

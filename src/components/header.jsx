@@ -1,25 +1,36 @@
 "use client";
 
-import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { SignInButton } from "./signin-button";
 
 const links = [
   { href: "/", label: "#Home" },
   { href: "/tipjar", label: "#My Tipjar" },
   { href: "/about", label: "#About" },
-  { href: "https://linktr.ee/Suilaxy", label: "#Visit Us" },
+  { href: "https://linktr.ee/SolanaTipJar", label: "#Visit Us" },
 ];
 
 import "./css/header.css";
 
 export default function Header() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   return (
-    <header className="flex flex-row justify-between align-middle items-center pt-5 mx-5">
-      {/* 3 components in a flex row */}
-      {/* Navigations on the left, is a flex col */}
-      <nav>
+    <>
+      <header className="flex py-4 justify-center align-middle items-center">
+        {/* 3 components in a flex row */}
+        {/* Logo in the middle */}
+        <a href="/">
+          <img
+            src="/assets/badge-logo.svg"
+            alt="a badge logo of Solana Tipjar"
+          />
+        </a>
+      </header>
+
+      <nav className="fixed top-0 z-50 p-4">
         <ul>
           {links.map(({ href, label }) => (
             <li key={`${href}${label}`}>
@@ -46,14 +57,29 @@ export default function Header() {
         </ul>
       </nav>
 
-      {/* Logo in the middle */}
-      <a href="/">
-        <img src="/assets/badge-logo.svg" alt="a badge logo of Solana Tipjar" />
-      </a>
-
-      {/* Login buttons on the right, is a flex col */}
-      <nav className="flex flex-col items-end">
-        <ul>
+      <nav className="flex font-primary flex-col items-end fixed top-0 right-0 z-50 p-4">
+        <ul className="flex flex-col gap-2">
+          <li>
+            {status === "authenticated" ? (
+              <div className="flex items-center bg-gray-800 border-[3px] p-3 rounded-lg shadow-md">
+                <img
+                  src={session?.user?.image}
+                  alt="Profile Image"
+                  className="rounded-full w-10 h-10 mr-3"
+                />
+                <div>
+                  <p className="text-lg text-white font-medium">
+                    Twitch:{" "}
+                    <span className="text-lg text-white font-bold">
+                      {session?.user?.name || "User"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <SignInButton />
+            )}
+          </li>
           <li>
             <button>
               <img
@@ -62,17 +88,8 @@ export default function Header() {
               />
             </button>
           </li>
-          <li>
-            <button>
-              <img
-                src="/assets/twitch-login.svg"
-                alt="Twitch platform login button"
-              />
-            </button>
-          </li>
         </ul>
-        <p>Login to start</p>
       </nav>
-    </header>
+    </>
   );
 }
