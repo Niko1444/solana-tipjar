@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { SignInButton } from "./signin-button";
+import { TwitchSignInButton } from "./signin-button";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const links = [
   { href: "/", label: "#Home" },
@@ -57,39 +58,30 @@ export default function Header() {
         </ul>
       </nav>
 
-      <nav className="flex font-primary flex-col items-end fixed top-0 right-0 z-50 p-4">
-        <ul className="flex flex-col gap-2">
-          <li>
-            {status === "authenticated" ? (
-              <div className="flex items-center bg-gray-800 border-[3px] p-3 rounded-lg shadow-md">
-                <img
-                  src={session?.user?.image}
-                  alt="Profile Image"
-                  className="rounded-full w-10 h-10 mr-3"
-                />
-                <div>
-                  <p className="text-lg text-white font-medium">
-                    Twitch:{" "}
-                    <span className="text-lg text-white font-bold">
-                      {session?.user?.name || "User"}
-                    </span>
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <SignInButton />
-            )}
-          </li>
-          <li>
-            <button>
+      <div className="flex font-primary fixed top-0 right-0 z-50 p-4">
+        <div className="flex flex-col gap-2">
+          {status === "authenticated" ? (
+            <div className="flex items-center bg-gray-800 w-60 p-3 h-14 rounded-lg shadow-md">
               <img
-                src="/assets/phantom-login.svg"
-                alt="Phantom wallet login button"
+                src={session?.user?.image}
+                alt="Profile Image"
+                className="rounded-full w-10 h-10 mr-3"
               />
-            </button>
-          </li>
-        </ul>
-      </nav>
+              <div>
+                <p className="text-lg text-white font-medium">
+                  Twitch:{" "}
+                  <span className="text-lg text-white font-bold">
+                    {session?.user?.name || "User"}
+                  </span>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <TwitchSignInButton />
+          )}
+          <WalletMultiButton className="wallet-button" />
+        </div>
+      </div>
     </>
   );
 }

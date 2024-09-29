@@ -6,6 +6,7 @@ import "@fontsource/monofett";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import AuthLayout from "../components/utils/auth-layout";
+import SolanaWalletLayout from "../components/utils/solana-wallet-layout";
 
 export const metadata = {
   title: "Create Next App",
@@ -17,11 +18,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="main-bg flex flex-col min-h-screen">
         <AuthLayout>
-          {" "}
-          {/* Client-side component for SessionProvider */}
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <SolanaWalletLayout>
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </SolanaWalletLayout>
         </AuthLayout>
       </body>
     </html>
