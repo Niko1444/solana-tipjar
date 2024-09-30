@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { TwitchSignInButton } from "./signin-button";
+import { TwitchSignInButton } from "./twitch-signin";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useState, useEffect } from "react";
 
@@ -20,7 +20,6 @@ export default function Header() {
   const { data: session, status } = useSession();
   const [isClient, setIsClient] = useState(false);
 
-  // Ensure that the component is rendered client-side
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -89,6 +88,7 @@ export default function Header() {
             ) : (
               <TwitchSignInButton />
             )}
+
             {/* Solana Wallet Button */}
             <WalletMultiButton className="wallet-button" />
           </div>

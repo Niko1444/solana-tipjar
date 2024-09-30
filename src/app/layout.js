@@ -11,12 +11,6 @@ import SolanaWalletLayout from "../components/utils/solana-wallet-layout";
 export const metadata = {
   title: "Solana TipJar",
   description: "Donation platform Web3/dApps - Giving your gifts",
-  icons: {
-    icon: ["/favicon.ico?v=4"],
-    apple: ["/apple-touch-icon.png?v=4"],
-    shortcut: ["/apple-touch-icon.png"],
-  },
-  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({ children }) {

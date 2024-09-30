@@ -11,7 +11,7 @@ const SendSol = ({ recipient, closeDialog }) => {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [isSending, setIsSending] = useState(false);
-  const [amount, setAmount] = useState(0.1); // Default to 0.1 SOL
+  const [amount, setAmount] = useState(0.1);
 
   const handleSendSol = async (event) => {
     event.preventDefault();
@@ -43,7 +43,7 @@ const SendSol = ({ recipient, closeDialog }) => {
 
       const signature = await sendTransaction(transaction, connection);
       console.log(`Transaction signature: ${signature}`);
-      closeDialog(); // Close the dialog after successful transaction
+      closeDialog();
     } catch (error) {
       console.error("Transaction failed", error);
     } finally {
@@ -51,7 +51,7 @@ const SendSol = ({ recipient, closeDialog }) => {
     }
   };
 
-  const isValidAmount = amount > 0; // Validate if the amount is greater than 0
+  const isValidAmount = amount > 0;
 
   return (
     <div className="bg-black rounded-lg p-6 max-w-md mx-auto">
@@ -69,8 +69,8 @@ const SendSol = ({ recipient, closeDialog }) => {
           </label>
           <input
             type="number"
-            step="0.1"
-            min="0.001"
+            step="0.01"
+            min="0.01"
             value={amount}
             onChange={(e) => setAmount(parseFloat(e.target.value))}
             className="w-full py-2 px-3 border-white border bg-black text-white text-center text-lg font-semibold rounded-lg shadow-inner"
