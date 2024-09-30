@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        "solana-gradient":
+          "linear-gradient(223deg, #3B7B52 5.84%, #48287A 98.18%)",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

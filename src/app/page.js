@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react"; // Import wallet hook
+import SendSol from "../components/sui/send-sol";
 
 export default function Home() {
+  const { publicKey, connect } = useWallet(); // Get wallet connection
   const [query, setQuery] = useState(""); // State for search query
   const [streamers, setStreamers] = useState([]); // State for streamers list
   const [loading, setLoading] = useState(false); // State for loading indicator
+  const [selectedStreamer, setSelectedStreamer] = useState(null); // State for selected streamer
+  const [showDialog, setShowDialog] = useState(false); // State to show/hide dialog
 
-  // Function to fetch streamers based on the search query
   const fetchStreamers = async () => {
     if (query.trim().length < 4) {
-      // If query is less than 4 characters, clear the streamers list
       setStreamers([]);
       return;
     }
@@ -42,6 +45,24 @@ export default function Home() {
     }, 500); // 500ms delay for debouncing
     return () => clearTimeout(debounceTimer);
   }, [query]);
+
+  // Handle when a streamer is clicked
+  const handleStreamerClick = async (streamer) => {
+    if (!publicKey) {
+      // If wallet is not connected, show an alert and attempt to connect
+      alert("Please connect your wallet before donating.");
+      try {
+        await connect(); // Trigger wallet connection
+      } catch (error) {
+        console.error("Failed to connect wallet:", error);
+      }
+      return;
+    }
+
+    // If wallet is connected, open the donation dialog
+    setSelectedStreamer(streamer);
+    setShowDialog(true);
+  };
 
   return (
     <div className="flex font-primary flex-col md:flex-row justify-between items-start p-6 md:p-10 text-white max-w-6xl mx-auto">
@@ -75,7 +96,8 @@ export default function Home() {
             streamers.slice(0, 4).map((streamer, index) => (
               <div
                 key={index}
-                className="flex items-center bg-gray-800 rounded-lg p-3"
+                onClick={() => handleStreamerClick(streamer)} // Trigger dialog on click
+                className="flex items-center bg-gray-800 rounded-lg p-3 cursor-pointer"
               >
                 <img
                   src="/assets/twitch-logo.svg"
@@ -95,6 +117,21 @@ export default function Home() {
           Recent Donation <span className="ml-2">➔</span>
         </button>
       </div>
+
+      {/* Donation Dialog */}
+      {showDialog && selectedStreamer && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-solana-gradient font-primary w-[28.75rem] h-[36.25rem] rounded-xl flex flex-col justify-center align-middle items-center">
+            <h2 className="font-bold text-xl mb-4">
+              Donate to {selectedStreamer.name}
+            </h2>
+            <SendSol
+              recipient={selectedStreamer.pda}
+              closeDialog={() => setShowDialog(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
