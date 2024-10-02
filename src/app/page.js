@@ -141,8 +141,8 @@ export default function Home() {
       {/* Donation Dialog */}
       {triggerDonation && pdaAccount && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-solana-gradient font-primary w-[28.75rem] h-[36.25rem] rounded-xl flex flex-col justify-center align-middle items-center">
-            <h2 className="font-bold text-xl mb-2">Donate to {query}</h2>
+          <div className="bg-solana-gradient font-primary w-[50rem] h-[36.25rem] rounded-xl flex flex-col justify-center align-middle items-center">
+            <h2 className="font-bold text-2xl mb-7">Donate to {query}</h2>
             <SendSol
               recipient={pdaAccount.user.toString()}
               closeDialog={() => setTriggerDonation(false)}
