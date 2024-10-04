@@ -124,8 +124,8 @@ const SendSol = ({ recipient, closeDialog, streamerName }) => {
               </label>
               <input
                 type="number"
-                step="0.01"
-                min="0.01"
+                step="0.0001"
+                min="0.0001"
                 value={amount}
                 onChange={(e) => setAmount(parseFloat(e.target.value))}
                 className="w-full py-2 px-3 border-white border bg-black text-white text-center text-lg font-semibold rounded-lg shadow-inner"

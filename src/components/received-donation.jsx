@@ -5,26 +5,40 @@ import { useSession } from "next-auth/react";
 const ReceivedDonation = ({ onBackClick }) => {
   const [donations, setDonations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { data: session } = useSession();
+  const [visibleCount, setVisibleCount] = useState(5); // Start by showing 5 donations
+  const { data: session, status } = useSession();
 
   // Fetch donations when the component mounts
   useEffect(() => {
     const fetchDonations = async () => {
-      try {
-        const response = await axios.get(
-          "https://tipjar-api.onrender.com/m/received-messages/" +
-            session.user.name
-        );
-        setDonations(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching donations:", error);
-        setIsLoading(false);
+      // Ensure that the session is loaded and user exists
+      if (status === "authenticated" && session?.user?.name) {
+        try {
+          const response = await axios.get(
+            `https://tipjar-api.onrender.com/m/received-messages/${session.user.name}`
+          );
+          setDonations(response.data);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error fetching donations:", error);
+          setIsLoading(false);
+        }
       }
     };
 
     fetchDonations();
-  }, []);
+  }, [session?.user?.name, status]);
+
+  // Function to load more donations
+  const loadMoreDonations = () => {
+    setVisibleCount((prevCount) => prevCount + 5);
+  };
+
+  // Function to shorten the address
+  const shortenAddress = (address) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-6)}`;
+  };
 
   return (
     <div className="w-screen pl-60 p-4 relative flex flex-col justify-between items-start">
@@ -52,21 +66,17 @@ const ReceivedDonation = ({ onBackClick }) => {
                   <th className="border-b px-4 py-2">Donator Name</th>
                   <th className="border-b px-4 py-2">Message</th>
                   <th className="border-b px-4 py-2">Donator Address</th>
-                  <th className="border-b px-4 py-2">Streamer Name</th>
                 </tr>
               </thead>
               <tbody>
-                {donations.map((donation) => (
+                {donations.slice(0, visibleCount).map((donation) => (
                   <tr key={donation._id}>
                     <td className="border-b px-4 py-2">
                       {donation.donator_name}
                     </td>
                     <td className="border-b px-4 py-2">{donation.message}</td>
                     <td className="border-b px-4 py-2">
-                      {donation.donator_address}
-                    </td>
-                    <td className="border-b px-4 py-2">
-                      {donation.streamer_name}
+                      {shortenAddress(donation.donator_address)}
                     </td>
                   </tr>
                 ))}
@@ -74,16 +84,23 @@ const ReceivedDonation = ({ onBackClick }) => {
             </table>
           ) : (
             <p className="text-white text-center">
-              No Received donations found.
+              No received donations found.
             </p>
           )}
         </div>
 
-        <div className="flex mx-[30rem] flex-row gap-2 justify-center align-middle items-center">
-          <button className="mt-4 flex-grow bg-white hover:bg-slate-300 text-black font-semibold py-2 px-4 rounded-lg transition">
-            Load More
-          </button>
-          <button className="mt-4 flex-grow bg-[#232A70] hover:bg-[#353a6e] text-white font-semibold py-2 px-4 rounded-lg transition">
+        <div className="flex flex-row gap-2 justify-center align-middle items-center">
+          {/* Load more button */}
+          {visibleCount < donations.length && (
+            <button
+              onClick={loadMoreDonations}
+              className="mt-4 bg-white hover:bg-slate-300 text-black font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Load More
+            </button>
+          )}
+
+          <button className="mt-4 bg-[#232A70] hover:bg-[#353a6e] text-white font-semibold py-2 px-4 rounded-lg transition">
             Setup OBS Chat Reader
           </button>
         </div>

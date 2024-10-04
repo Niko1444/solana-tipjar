@@ -29,6 +29,12 @@ const RecentDonation = ({ onBackClick }) => {
     setDisplayedDonations((prevCount) => prevCount + 5);
   };
 
+  // Function to shorten the address
+  const shortenAddress = (address) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-6)}`;
+  };
+
   return (
     <div className="w-screen pl-60 p-4 relative flex flex-col justify-between items-start">
       {/* Back chevron to go back to search */}
@@ -62,11 +68,11 @@ const RecentDonation = ({ onBackClick }) => {
                 {donations.slice(0, displayedDonations).map((donation) => (
                   <tr key={donation._id}>
                     <td className="border-b px-4 py-2">
-                      {donation.donator_address}
+                      {shortenAddress(donation.donator_address)}
                     </td>
                     <td className="border-b px-4 py-2">{donation.message}</td>
                     <td className="border-b px-4 py-2">
-                      {donation.streamer_address}
+                      {shortenAddress(donation.streamer_address)}
                     </td>
                     <td className="border-b px-4 py-2">
                       {donation.streamer_name}
