@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { Link } from "next-view-transitions";
 import { TwitchSignInButton } from "./twitch-signin";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useState, useEffect } from "react";
@@ -27,7 +28,7 @@ export default function Header() {
   return (
     <>
       <header className="flex py-4 justify-center align-middle items-center">
-        {/* Logo in the middle */}
+        {/* Logo */}
         <a href="/">
           <img
             src="/assets/badge-logo.svg"
@@ -37,7 +38,7 @@ export default function Header() {
       </header>
 
       {/* Navigation Links */}
-      <nav className="fixed top-0 z-50 p-4">
+      {/* <nav className="fixed top-0 z-50 p-4">
         <ul>
           {links.map(({ href, label }) => (
             <li key={`${href}${label}`}>
@@ -59,6 +60,33 @@ export default function Header() {
               >
                 {label}
               </a>
+            </li>
+          ))}
+        </ul>
+      </nav> */}
+
+      {/* Using next-view-transitions Link component */}
+      <nav className="fixed top-0 z-50 p-4">
+        <ul>
+          {links.map(({ href, label }) => (
+            <li key={`${href}${label}`}>
+              <Link
+                href={href}
+                style={
+                  pathname === href
+                    ? {
+                        textDecoration: "none",
+                        color: "#FFACD1",
+                        WebkitTextStroke: "2px #ffffff",
+                      }
+                    : {
+                        color: "#A2E5F4",
+                      }
+                }
+                className="text-[2rem] font-secondary"
+              >
+                {label}
+              </Link>
             </li>
           ))}
         </ul>

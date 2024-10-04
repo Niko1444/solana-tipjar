@@ -6,13 +6,17 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useSession } from "next-auth/react";
+import axios from "axios";
 
-const SendSol = ({ recipient, closeDialog }) => {
+const SendSol = ({ recipient, closeDialog, streamerName }) => {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [isSending, setIsSending] = useState(false);
   const [amount, setAmount] = useState(0.1);
-  const [message, setMessage] = useState(""); // State for the donation message
+  const [message, setMessage] = useState("");
+  const { data: session } = useSession();
+  const donatorUsername = session?.user?.name;
 
   const handleSendSol = async (event) => {
     event.preventDefault();
@@ -42,21 +46,47 @@ const SendSol = ({ recipient, closeDialog }) => {
 
       transaction.add(sendSolInstruction);
 
-      // You could potentially include a memo instruction with the message here
-      // However, Solana doesn't have native message fields with transfers
-      // Memo instruction is an optional field
-      if (message) {
-        const memoInstruction = SystemProgram.memo({
-          data: message,
-        });
-        transaction.add(memoInstruction);
+      // Send the transaction
+      const signature = await sendTransaction(transaction, connection);
+
+      // Confirm the transaction on Solana
+      const confirmation = await connection.confirmTransaction(
+        signature,
+        "confirmed"
+      );
+
+      if (confirmation.value.err) {
+        throw new Error("Transaction failed to confirm");
       }
 
-      const signature = await sendTransaction(transaction, connection);
-      console.log(`Transaction signature: ${signature}`);
+      // If transaction is confirmed, log it to the backend
+      console.log("Transaction confirmed successfully!");
+      console.log(`Transaction Signature (Tx ID): ${signature}`);
+      console.log(`Donator Wallet Address: ${publicKey.toString()}`);
+      console.log("Donator Twitch Username: ", donatorUsername);
+      console.log(`Streamer Twitch Username: ${streamerName}`);
+      console.log(`Amount Donated: ${amount} SOL`);
+      console.log(`Streamer Wallet Address: ${recipient}`);
+      console.log(`Donation Message: ${message}`);
+
+      // Make POST request to the API to log the donation
+      await axios.post("https://tipjar-api.onrender.com/m/donations/add", {
+        transaction_signature: signature,
+        donator_address: publicKey.toString(),
+        donator_name: donatorUsername,
+        streamer_name: streamerName,
+        streamer_address: recipient,
+        amount_donated: amount,
+        message: message,
+      });
+
+      console.log("Donation logged in the database");
       closeDialog();
     } catch (error) {
-      console.error("Transaction failed", error);
+      console.error(
+        "Transaction failed or donation could not be logged:",
+        error
+      );
     } finally {
       setIsSending(false);
     }
