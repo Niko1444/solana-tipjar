@@ -130,7 +130,6 @@ export default function Header() {
                     >
                       Sign Out
                     </button>
-                    b
                   </div>
                 </div>
               </div>
