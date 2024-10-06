@@ -18,6 +18,7 @@ module.exports = {
       fontFamily: {
         primary: "Urbanist Variable, sans-serif",
         secondary: "Monofett, monospace",
+        comic: "Comic Sans MS, sans-serif",
       },
       fontWeight: {
         regular: 400,

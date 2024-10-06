@@ -142,15 +142,29 @@ export default function TipJar() {
             {isLoading ? (
               <p className="text-lg text-gray-400">Loading...</p>
             ) : pdaAccount ? (
-              <div className="bg-gray-800 p-6 rounded-lg mt-4">
-                <p className="text-lg">
-                  <strong>Receive Donation Wallet:</strong>{" "}
-                  {pdaAccount.user.toString()}
-                </p>
-                <p className="text-lg">
-                  <strong>Username:</strong> {pdaAccount.userName}
-                </p>
-              </div>
+              <>
+                <div className="flex flex-col md:flex-row items-center md:items-start">
+                  <div className="relative flex flex-col items-center mb-6 md:mb-0">
+                    <img
+                      src="/assets/jar-noname.svg"
+                      alt="TipJar"
+                      className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72"
+                    />
+                    <p className="font-comic text-white bg-black py-1 px-4 font-outline-2 text-md absolute bottom-[40%] text-center">
+                      {pdaAccount.userName}
+                    </p>
+                  </div>
+                  <div className="bg-[rgba(255,255,255,0.1)] backdrop-blur p-4 sm:p-6 rounded-lg mt-4 w-full md:w-auto md:ml-8">
+                    <p className="text-sm sm:text-md md:text-lg">
+                      <strong>Receive Donation Wallet:</strong>{" "}
+                      {pdaAccount.user.toString()}
+                    </p>
+                    <p className="text-sm sm:text-md md:text-lg">
+                      <strong>Username:</strong> {pdaAccount.userName}
+                    </p>
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="flex flex-col items-start">
                 {!publicKey && (

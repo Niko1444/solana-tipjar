@@ -32,3 +32,12 @@ input[type="number"] {
 button.wallet-adapter-button-trigger {
   @apply flex font-bold font-primary items-center hover:bg-gray-800 bg-[#A89CF2] h-14 p-3 w-60 justify-center align-middle rounded-lg shadow-md;
 }
+
+@layer base {
+  .font-outline-2 {
+    -webkit-text-stroke: 1px white;
+  }
+  .font-outline-4 {
+    -webkit-text-stroke: 4px white;
+  }
+}
