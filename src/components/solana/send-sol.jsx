@@ -59,15 +59,17 @@ const SendSol = ({ recipient, closeDialog, streamerName }) => {
         throw new Error("Transaction failed to confirm");
       }
 
-      // If transaction is confirmed, log it to the backend
-      console.log("Transaction confirmed successfully!");
-      console.log(`Transaction Signature (Tx ID): ${signature}`);
-      console.log(`Donator Wallet Address: ${publicKey.toString()}`);
-      console.log("Donator Twitch Username: ", donatorUsername);
-      console.log(`Streamer Twitch Username: ${streamerName}`);
-      console.log(`Amount Donated: ${amount} SOL`);
-      console.log(`Streamer Wallet Address: ${recipient}`);
-      console.log(`Donation Message: ${message}`);
+      const payload = {
+        transaction_signature: signature,
+        donator_address: publicKey.toString(),
+        donator_name: donatorUsername,
+        streamer_name: streamerName,
+        streamer_address: recipient,
+        amount_sol: amount,
+        message: message,
+      };
+
+      console.log("Payload being sent to API: ", payload);
 
       // Make POST request to the API to log the donation
       await axios.post("https://tipjar-api.onrender.com/m/donations/add", {
@@ -76,7 +78,7 @@ const SendSol = ({ recipient, closeDialog, streamerName }) => {
         donator_name: donatorUsername,
         streamer_name: streamerName,
         streamer_address: recipient,
-        amount_donated: amount,
+        amount_sol: amount,
         message: message,
       });
 
