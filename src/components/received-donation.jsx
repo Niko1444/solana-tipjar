@@ -5,19 +5,36 @@ import { useSession } from "next-auth/react";
 const ReceivedDonation = ({ onBackClick }) => {
   const [donations, setDonations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(5); // Start by showing 5 donations
+  const [isReading, setIsReading] = useState(false); // To track if reading is enabled
   const { data: session, status } = useSession();
 
-  // Fetch donations when the component mounts
+  // Text-to-Speech function to read out donation messages
+  const readDonationMessage = (donation) => {
+    const message = `${donation.donator_name} donated ${donation.amount_donated} Solana and said: ${donation.message}`;
+    const utterance = new SpeechSynthesisUtterance(message);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Function to start reading all donations when button is clicked
+  const startReadingDonations = () => {
+    donations.forEach((donation) => {
+      readDonationMessage(donation);
+    });
+  };
+
+  // Fetch donations when the component mounts and every 30 seconds
   useEffect(() => {
     const fetchDonations = async () => {
-      // Ensure that the session is loaded and user exists
+      // Ensure the session is loaded and the user exists
       if (status === "authenticated" && session?.user?.name) {
         try {
           const response = await axios.get(
             `https://tipjar-api.onrender.com/m/received-messages/${session.user.name}`
           );
-          setDonations(response.data);
+          const latestDonations = response.data;
+
+          // Set the fetched donations
+          setDonations(latestDonations);
           setIsLoading(false);
         } catch (error) {
           console.error("Error fetching donations:", error);
@@ -26,18 +43,29 @@ const ReceivedDonation = ({ onBackClick }) => {
       }
     };
 
+    // Fetch donations immediately and then every 30 seconds
     fetchDonations();
-  }, [session?.user?.name, status]);
+    const interval = setInterval(fetchDonations, 30000); // Poll every 30 seconds
 
-  // Function to load more donations
-  const loadMoreDonations = () => {
-    setVisibleCount((prevCount) => prevCount + 5);
-  };
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [session?.user?.name, status]);
 
   // Function to shorten the address
   const shortenAddress = (address) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
+  };
+
+  // Handle start reading
+  const handleStartReading = () => {
+    setIsReading(true);
+    startReadingDonations();
+  };
+
+  // Handle stop reading
+  const handleStopReading = () => {
+    setIsReading(false);
+    window.speechSynthesis.cancel(); // Stop any ongoing TTS
   };
 
   return (
@@ -51,7 +79,7 @@ const ReceivedDonation = ({ onBackClick }) => {
       </button>
 
       <div className="w-[87%] pt-7 flex flex-col gap-2">
-        <div className="w-full text-[2rem] font-black bg-solana-gradient h-12 flex justify-center items-center align-middle rounded-md uppercase">
+        <div className="w-full text-[1.7rem] font-black bg-solana-gradient h-12 flex justify-center items-center align-middle rounded-md uppercase">
           Received Donations On Solana TipJar
         </div>
 
@@ -65,16 +93,20 @@ const ReceivedDonation = ({ onBackClick }) => {
                 <tr>
                   <th className="border-b px-4 py-2">Donator Name</th>
                   <th className="border-b px-4 py-2">Message</th>
+                  <th className="border-b px-4 py-2">Amount Donated (SOL)</th>
                   <th className="border-b px-4 py-2">Donator Address</th>
                 </tr>
               </thead>
               <tbody>
-                {donations.slice(0, visibleCount).map((donation) => (
+                {donations.map((donation) => (
                   <tr key={donation._id}>
                     <td className="border-b px-4 py-2">
                       {donation.donator_name}
                     </td>
                     <td className="border-b px-4 py-2">{donation.message}</td>
+                    <td className="border-b px-4 py-2">
+                      {donation.amount_donated} SOL
+                    </td>
                     <td className="border-b px-4 py-2">
                       {shortenAddress(donation.donator_address)}
                     </td>
@@ -90,18 +122,30 @@ const ReceivedDonation = ({ onBackClick }) => {
         </div>
 
         <div className="flex flex-row gap-2 justify-center align-middle items-center">
-          {/* Load more button */}
-          {visibleCount < donations.length && (
+          {/* Button to start reading donations */}
+          {!isReading ? (
             <button
-              onClick={loadMoreDonations}
-              className="mt-4 bg-white hover:bg-slate-300 text-black font-semibold py-2 px-4 rounded-lg transition"
+              onClick={handleStartReading}
+              className="mt-4 bg-[#232A70] hover:bg-[#353a6e] text-white font-semibold py-2 px-4 rounded-lg transition"
             >
-              Load More
+              Start Reading Audio
+            </button>
+          ) : (
+            <button
+              onClick={handleStopReading}
+              className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Stop Reading Audio
             </button>
           )}
 
-          <button className="mt-4 bg-[#232A70] hover:bg-[#353a6e] text-white font-semibold py-2 px-4 rounded-lg transition">
-            Setup OBS Chat Reader
+          <button
+            onClick={() =>
+              window.open("https://obsproject.com/kb/audio-sources", "_blank")
+            }
+            className="mt-4 bg-[#232A70] hover:bg-[#353a6e] text-white font-semibold py-2 px-4 rounded-lg transition"
+          >
+            How to Setup OBS Chat Reader
           </button>
         </div>
       </div>
